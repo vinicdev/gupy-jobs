@@ -1,20 +1,10 @@
 const api = `https://cors-everywhere.onrender.com/https://portal.api.gupy.io/api/v1/jobs?`;
-const jobName = "&jobName=front-end";
-const type = "&type=vacancy_type_effective";
-const isRemoteWork = "&isRemoteWork=true";
-const limit = "&limit=3000";
+const modal = document.querySelector(".modal");
 
-const fetchGupy = async () => {
-
+const fetchGupy = async (jobSettign) => {
   document.getElementById("loading").style.display = "block";
 
-  const APIResponse = await fetch(
-
-    // `https://cors-everywhere.onrender.com/https://portal.api.gupy.io/api/v1/jobs?&jobName=financeiro&limit=300&type=vacancy_type_effective`
-
-
-    `${api}${limit}${jobName}${isRemoteWork}${type}`
-  );
+  const APIResponse = await fetch(`${api}${jobSettign}`);
 
   document.getElementById("loading").style.display = "none";
 
@@ -26,8 +16,8 @@ const fetchGupy = async () => {
   }
 };
 
-const renderGupy = async () => {
-  const response = await fetchGupy();
+const renderGupy = async (jobSettign) => {
+  const response = await fetchGupy(jobSettign);
 
   // Sort the jobs by published date in descending order
   const sortedJobs = response.data.sort((a, b) => {
@@ -41,8 +31,9 @@ const renderGupy = async () => {
           
         <div class="title">
         <div class="info-company">
-        <img src="${element["careerPageLogo"]}" alt="${element["careerPageName"]
-      }" >
+        <img src="${element["careerPageLogo"]}" alt="${
+      element["careerPageName"]
+    }" >
         
         <h1 class="job-company">${element["careerPageName"]}</h1>
           
@@ -59,28 +50,30 @@ const renderGupy = async () => {
         </div>
 
         <span>Vaga publicada em: ${new Date(
-        element["publishedDate"]
-      ).toLocaleDateString("pt-BR", {
-        day: "2-digit",
-        month: "2-digit",
-        year: "numeric",
-      })}</span>
+          element["publishedDate"]
+        ).toLocaleDateString("pt-BR", {
+          day: "2-digit",
+          month: "2-digit",
+          year: "numeric",
+        })}</span>
       
       <div class="remote-work">
-      <span class="tooltip">Trabalho remoto:  ${element["isRemoteWork"] === true
-        ? `<i class="ph-house"></i> <span class="tooltiptext">Sim
+      <span class="tooltip">Trabalho remoto:  ${
+        element["isRemoteWork"] === true
+          ? `<i class="ph-house"></i> <span class="tooltiptext">Sim
         </span>`
-        : `<i class="ph-buildings"></i> <span class="tooltiptext">Não
+          : `<i class="ph-buildings"></i> <span class="tooltiptext">Não
         </span>`
       }</span>
       </div>
       
       <div class="gupy">
-      <span class="tooltip">Tem Selo Gupy: ${element["badges"]["friendlyBadge"] === true
-        ? `<i class="ph-circle-wavy-check"></i>
+      <span class="tooltip">Tem Selo Gupy: ${
+        element["badges"]["friendlyBadge"] === true
+          ? `<i class="ph-circle-wavy-check"></i>
       
       <span class="tooltiptext">Empresas com alta taxa de retorno e atividade nas vagas nos últimos 3 meses</span>`
-        : `<i class="ph-circle-wavy-warning"></i> 
+          : `<i class="ph-circle-wavy-warning"></i> 
       
       <span class="tooltiptext">Sem informações</span>`
       }
@@ -102,4 +95,24 @@ const renderGupy = async () => {
   document.getElementById("cards-container").innerHTML = jobCardsString;
 };
 
-renderGupy();
+document
+  .getElementById("formJobs")
+  .addEventListener("submit", function (event) {
+    event.preventDefault();
+
+    const chosenJob = document.querySelector('input[name="option"]:checked');
+
+    modal.style.display = "none";
+
+    let jobSettign = "";
+
+    if (chosenJob.value === "front") {
+      jobSettign = `&jobName=front-end&type=vacancy_type_effective&isRemoteWork=true&limit=3000`;
+      renderGupy(jobSettign);
+    }
+
+    if (chosenJob.value === "design") {
+      jobSettign = `&jobName=design&limit=3000&type=vacancy_type_internship&&isRemoteWork=true`;
+      renderGupy(jobSettign);
+    }
+  });
